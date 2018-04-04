@@ -51,7 +51,8 @@ class RunState(CommandListState):
     extra = "(run)"
     nextState = CreateTarState if settings.get('use_tar') else TryEmitState
     commandlist = [ (None, 'run:mkdir -p ##TMPDIR##/out_0/')
-                  , ('OK:RETVAL(0)', 'run:python PODS/PodLine.py')
+                  , ('OK:RETVAL(0)', 'run:time ./ffmpeg -start_number 1 -i ##TMPDIR##/in_0/%08d.png '
+                                     '-filter_complex "[0:0][0:1][1:0][1:1] concat=n=2:v=1:a=1" -c:a copy -safe 0 -start_number 1 ##TMPDIR##/out_0/%08d.png')
                   , ('OK:RETVAL(0)', None)
                     ]
 
@@ -87,4 +88,4 @@ class InitState(InitStateTemplate):
 
     def __init__(self, prevState, **kwargs):
         super(InitState, self).__init__(prevState, **kwargs)
-        self.trace_func = lambda ev, msg, op: default_trace_func(ev, msg, op, stage='rotate')
+        self.trace_func = lambda ev, msg, op: default_trace_func(ev, msg, op, stage='complex')
